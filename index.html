@@ -8,7 +8,58 @@
   </head>
   <body>
     <h1>This is Powerdoro</h1>
-    <h3>23:18:58</h3>
-  
+    <h3 id = "demo"></h3>
+    <button type = "button" onclick = "startTime()">Init</button>
+    <button type = "button" onclick = "pauseTime()">Pause</button>
+
+    <script src ="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+      let timestamp_current = 0; 
+      let pausePressed = false;
+      
+      const h3_time = document.getElementById('demo');
+
+      socket.on('time', (timestamp_seconds) => {
+        console.log(timestamp_seconds);
+        timestamp_current = timestamp_seconds;
+        h3_time.innerHTML = changeSecondsTotimestamp_current(timestamp_current);
+      });
+
+      function startTime() {
+        console.log(timestamp_current);
+
+        if (timestamp_current == 0 && !pausePressed) {
+          timestamp_current = 25 * 60; //minutes to seconds
+        }
+
+        socket.emit('start-time', timestamp_current);
+      }
+
+      function pauseTime() {
+        console.log(timestamp_current);
+        pausePressed = true;
+        socket.emit('pause-time', timestamp_current);
+      }
+ 
+      function changeSecondsTotimestamp_current(time_seconds) {
+        let min = Math.floor(parseInt(time_seconds) / 60);
+        let sec = parseInt(time_seconds) % 60;
+        
+        min = checkTime(min);
+        sec = checkTime(sec);
+
+        return min + ':' + sec;
+      }
+
+      function checkTime(time) {
+        if (time < 10) {
+          return '0' + time;
+        }
+
+        return time;
+      }
+
+   </script>
   </body>
 </html>
